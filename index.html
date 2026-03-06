@@ -121,6 +121,429 @@ table.lt tr{min-height:44px}
 <h1>RPM Financial Model</h1>
 <div class="sub">CY2026 CMS Physician Fee Schedule — Non-Facility Rates</div>
 </div>
+<picture>
+<source srcset="https://sanusom.com/wp-content/uploads/2023/07/sanusom_logo.webp" type="image/webp">
+<img src="https://sanusom.com/wp-content/uploads/2023/07/sanusom_logo.webp" alt="Sanusom" style="height:48px;opacity:.9" onerror="this.parentElement.style.display='none'">
+</picture>
+</div>
+<div style="background:linear-gradient(135deg,#1d4ed8,#1e3a8a);padding:0 20px 20px">
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+<label style="color:#93c5fd;font-size:14px;white-space:nowrap">MAC Locality:</label>
+<input id="srch" placeholder="Search localities..." oninput="filterSel()" style="background:#1e3a8a;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 10px;font-size:14px;width:200px;outline:none">
+<select id="sel" onchange="pickLocality(this.value)" style="background:#1e3a8a;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 10px;font-size:14px;flex:1;min-width:200px;-webkit-appearance:none;appearance:none"></select>
+</div>
+</div>
+<div class="tabs" id="maintabs">
+<button class="tab active" onclick="sw('inputs')">Rates & Inputs</button>
+<button class="tab" onclick="sw('practice')">Practice Averages</button>
+<button class="tab" onclick="sw('results')">Financial Summary</button>
+<button class="tab" id="libtab" onclick="sw('library')">Localities</button>
+</div>
+<div class="cnt">
+<div id="tab-inputs">
+<div class="sec"><div class="st" id="rtitle"></div>
+<div class="rt"><div class="rh"><span>HCPCS</span><span>Description</span><span>Non-Facility Rate</span><span>Frequency</span></div><div id="rrows"></div></div>
+</div>
+<div class="sec"><div class="st">Program Assumptions</div>
+<div class="g2">
+<div class="fld"><label>Total Patients Enrolled</label><input class="np" id="pts" value="300" oninput="calc()"></div>
+<div class="fld"><label>Avg Months on Program</label><input class="np" id="amo" value="6" oninput="calc()"></div>
+<div class="fld"><label>Collection %</label><input class="np" id="col" value="95" oninput="calc()"></div>
+<div class="fld"><label>% Billable Each Month</label><input class="np" id="bil" value="94" oninput="calc()"></div>
+</div></div>
+<div class="sec"><div class="st">Software & Staffing Costs</div>
+<div class="g2">
+<div class="fld"><label>SAMD Cost (mo/patient)</label><div class="riw"><span class="pf">$</span><input class="n" id="smd" value="13.50" oninput="calc()"></div></div>
+<div class="fld"><label>Staff $/hr (w/ benefits)</label><div class="riw"><span class="pf">$</span><input class="n" id="shr" value="28.80" oninput="calc()"></div></div>
+<div class="fld"><label>Staff minutes/patient Mo 1-3</label><input class="np" id="st13" value="9.6" oninput="calc()"></div>
+<div class="fld"><label>Staff minutes/patient Mo 4-6</label><input class="np" id="st46" value="4.8" oninput="calc()"></div>
+</div>
+<div class="ib"><div class="row"><span class="l">Monthly Staffing Cost/patient Mo 1-3</span><span class="v" id="sc13"></span></div><div class="row"><span class="l">Monthly Staffing Cost/patient Mo 4-6</span><span class="v" id="sc46"></span></div></div>
+</div></div>
+<div id="tab-practice" class="hid">
+<div class="sec"><div class="st">Practice Averages (% billed each code per month)</div>
+<p style="font-size:12px;color:#6b7280;margin-bottom:12px">Percentage of enrolled patients billed each code monthly.</p>
+<div class="pat"><div class="pah"><span>HCPCS</span><span>Description</span><span>Mo 1-3 (%)</span><span>Mo 4-6 (%)</span></div><div id="parows"></div></div>
+<div class="ib"><div class="row"><span class="l">Avg monthly revenue/patient (Mo 1-3)</span><span class="v" id="r13"></span></div><div class="row"><span class="l">Avg monthly revenue/patient (Mo 4-6)</span><span class="v" id="r46"></span></div></div>
+</div></div>
+<div id="tab-results" class="hid">
+<div class="lb" id="rloc"></div>
+<div class="sec"><div class="st">Per Patient (6-Month Period)</div>
+<div style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;padding:12px">
+<div class="row"><span class="l">6 Month Allowable</span><span class="v" id="rA"></span></div>
+<div class="row"><span class="l" id="rCL">Collection</span><span class="v"></span></div>
+<div class="row"><span class="l">6 Month Revenue</span><span class="v b" id="rR6"></span></div>
+<div class="dv"></div>
+<div class="row"><span class="l">Software Cost (6 mo)</span><span class="v" id="rS6"></span></div>
+<div class="row"><span class="l">Labor Cost (6 mo)</span><span class="v" id="rL6"></span></div>
+<div class="dv"></div>
+<div class="row hl"><span class="l">Profit per Patient (6 mo)</span><span class="v b" id="rP"></span></div>
+</div></div>
+<div class="sec"><div class="st" id="rTT"></div>
+<div style="background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;padding:12px">
+<div class="row"><span class="l">12 Month Revenue</span><span class="v b" id="rR12"></span></div>
+<div class="row"><span class="l">Software Cost</span><span class="v" id="rSA"></span></div>
+<div class="row"><span class="l">Staffing Cost</span><span class="v" id="rStA"></span></div>
+<div class="dv"></div>
+<div class="pb"><span class="l">Total 12-Month Profit</span><span class="v" id="rT"></span></div>
+</div></div>
+<div class="mts">
+<div class="mt mb"><div class="ml">Per-Patient Profit</div><div class="mv" id="mP"></div></div>
+<div class="mt mg"><div class="ml">Profit Margin</div><div class="mv" id="mM"></div></div>
+<div class="mt my"><div class="ml">Annual Profit</div><div class="mv" id="mT"></div></div>
+</div></div>
+<div id="tab-library" class="hid">
+<div class="sec"><div class="st" id="libTitle"></div>
+<p style="font-size:12px;color:#6b7280;margin-bottom:14px">All CY2026 MAC localities with RPM non-facility rates. Click any row to select.</p>
+<input class="srch" id="libSrch" placeholder="Filter localities..." oninput="buildLib()">
+<div class="libw"><table class="lt" id="libT"></table></div>
+</div></div>
+</div></div>
+<div class="ftr" id="ftr"></div>
+</div>
+<script>
+var CODES=["99453","99445","99454","99457","99458","99470"];
+var DESC={"99453":"Rem mntr physiol param setup","99445":"Rem mntr physiol param dev 2-15","99454":"Rem mntr physiol param dev 16+","99457":"Rem physiol mntr 1st 20 min","99458":"Rem physiol mntr ea addl 20","99470":"Rem physiol mntr 10-19 min"};
+var FREQ={"99453":"once","99445":"monthly","99454":"monthly","99457":"monthly","99458":"monthly","99470":"monthly"};
+var PAC=["99445","99454","99457","99458","99470"];
+var DPA={"99445":{a:21,b:9},"99454":{a:72,b:86},"99457":{a:24,b:12},"99458":{a:2,b:1},"99470":{a:14,b:3}};
+var LOCNAMES={
+"0210201":"ALASKA","1011200":"ALABAMA","0710213":"ARKANSAS","0310200":"ARIZONA",
+"0118217":"CA - VENTURA/SAN LUIS OBISPO","0118218":"CA - LOS ANGELES/ORANGE CNTY",
+"0118271":"CA - REDDING/CHICO","0118272":"CA - SACRAMENTO","0118273":"CA - SANTA BARBARA",
+"0118274":"CA - SAN LUIS OBISPO","0111205":"CA - SAN FRANCISCO/SAN MATEO/ALAMEDA/CONTRA COSTA",
+"0111209":"CA - SANTA CRUZ/MONTEREY","0111251":"CA - NAPA/SOLANO","0111252":"CA - SACRAMENTO METRO",
+"0111253":"CA - STOCKTON","0111254":"CA - FRESNO/BAKERSFIELD","0111255":"CA - VENTURA/OXNARD",
+"0111256":"CA - SAN BERNARDINO","0111257":"CA - RIVERSIDE","0111258":"CA - ANAHEIM/SANTA ANA",
+"0111259":"CA - SAN DIEGO","0111260":"CA - IMPERIAL","0111261":"CA - REDDING",
+"0111262":"CA - CHICO","0111263":"CA - SACRAMENTO AREA","0111264":"CA - MODESTO",
+"0111265":"CA - SANTA CLARA/SAN MATEO","0111266":"CA - SAN JOSE","0111267":"CA - OAKLAND/BERKELEY",
+"0111268":"CA - CONTRA COSTA","0111269":"CA - MARIN/NAPA/SOLANO","0111270":"CA - REST OF CA",
+"0111275":"CA - RIVERSIDE/SAN BERNARDINO","0411201":"COLORADO","1310200":"CONNECTICUT",
+"1220201":"DC + MD/VA SUBURBS","1210201":"DELAWARE","0910203":"FL - FORT LAUDERDALE",
+"0910204":"FL - MIAMI","0910299":"FL - REST OF FLORIDA","1021201":"GA - ATLANTA",
+"1021299":"GA - REST OF GEORGIA","0121201":"HAWAII","0510200":"IOWA","0220200":"IDAHO",
+"0610212":"IL - CHICAGO","0610215":"IL - EAST ST LOUIS","0610216":"IL - SUBURBAN CHICAGO",
+"0610299":"IL - REST OF ILLINOIS","0810200":"INDIANA","0520200":"KANSAS","1510200":"KENTUCKY",
+"0720201":"LA - NEW ORLEANS","0720299":"LA - REST OF LOUISIANA",
+"1421201":"MA - METROPOLITAN BOSTON","1421299":"MA - REST OF MASSACHUSETTS",
+"1230201":"MD - BALTIMORE/SURROUNDING","1230299":"MD - REST OF MARYLAND","1120201":"MAINE",
+"1411203":"MI - DETROIT","1411299":"MI - REST OF MICHIGAN",
+"0620200":"MINNESOTA",
+"0320201":"MONTANA",
+"0330201":"NORTH DAKOTA",
+"1130200":"VIRGINIA",
+"0540200":"MISSOURI","0730200":"MISSISSIPPI",
+"1431240":"NEW HAMPSHIRE",
+"0820201":"NE - OMAHA","0820299":"NE - REST OF NEBRASKA",
+"0131200":"NEVADA",
+"1320201":"NJ - NORTHERN NJ",
+"1320202":"NJ - NYC SUBURBS/LONG ISLAND","1320203":"NJ - PALISADES",
+"1328299":"NY - REST OF NEW YORK","1329204":"NY - QUEENS","1520200":"OHIO",
+"0431200":"OKLAHOMA","0230201":"OR - PORTLAND","0230299":"OR - REST OF OREGON",
+"1240201":"PA - METRO PHILADELPHIA","1240299":"PA - REST OF PENNSYLVANIA",
+"1250201":"RI - METRO PROVIDENCE","1250299":"RI - REST OF RHODE ISLAND",
+"0920220":"SC - COLUMBIA","0920250":"SC - CHARLESTON","0350209":"SD - SIOUX FALLS",
+"1031235":"TN - MEMPHIS","1441201":"TN - NASHVILLE","0441209":"TX - BEAUMONT",
+"0441211":"TX - CORPUS CHRISTI","0441215":"TX - DALLAS","0441218":"TX - HOUSTON",
+"0441220":"TX - GALVESTON","0441228":"TX - FORT WORTH","0441231":"TX - AUSTIN",
+"0441299":"TX - REST OF TEXAS","1451250":"UTAH","0240202":"WA - SEATTLE",
+"0240299":"WA - REST OF WASHINGTON","1140216":"WEST VIRGINIA",
+"0630200":"WISCONSIN",
+"1150200":"NORTH CAROLINA",
+"0530201":"WV - CHARLESTON","0530202":"WV - HUNTINGTON","0530299":"WV - REST OF WV",
+"0360221":"WYOMING",
+"0421205":"NM - ALBUQUERQUE",
+"0340202":"MO - ST LOUIS","0340102":"MO - KANSAS CITY"
+};
+var RAW="2026,02102,01,99445,55.32\n2026,02102,01,99453,22.78\n2026,02102,01,99454,55.32\n2026,02102,01,99457,63.31\n2026,02102,01,99458,52.29\n2026,02102,01,99470,31.91\n2026,10112,00,99445,45.49\n2026,10112,00,99453,18.79\n2026,10112,00,99454,45.49\n2026,10112,00,99457,47.43\n2026,10112,00,99458,38.37\n2026,10112,00,99470,23.88\n2026,07102,13,99445,44.64\n2026,07102,13,99453,18.42\n2026,07102,13,99454,44.64\n2026,07102,13,99457,46.88\n2026,07102,13,99458,37.99\n2026,07102,13,99470,23.61\n2026,03102,00,99445,50.45\n2026,03102,00,99453,20.96\n2026,03102,00,99454,50.45\n2026,03102,00,99457,50.65\n2026,03102,00,99458,40.61\n2026,03102,00,99470,25.49\n2026,01182,17,99445,61.40\n2026,01182,17,99453,25.29\n2026,01182,17,99454,61.40\n2026,01182,17,99457,57.31\n2026,01182,17,99458,45.07\n2026,01182,17,99470,28.83\n2026,01182,18,99445,61.47\n2026,01182,18,99453,25.34\n2026,01182,18,99454,61.47\n2026,01182,18,99457,57.66\n2026,01182,18,99458,45.41\n2026,01182,18,99470,29.00\n2026,01182,71,99445,56.92\n2026,01182,71,99453,23.42\n2026,01182,71,99454,56.92\n2026,01182,71,99457,54.39\n2026,01182,71,99458,43.04\n2026,01182,71,99470,27.37\n2026,01182,72,99445,62.10\n2026,01182,72,99453,25.53\n2026,01182,72,99454,62.10\n2026,01182,72,99457,57.66\n2026,01182,72,99458,45.28\n2026,01182,72,99470,29.00\n2026,01182,73,99445,59.15\n2026,01182,73,99453,24.33\n2026,01182,73,99454,59.15\n2026,01182,73,99457,55.68\n2026,01182,73,99458,43.88\n2026,01182,73,99470,28.01\n2026,01182,74,99445,60.54\n2026,01182,74,99453,24.89\n2026,01182,74,99454,60.54\n2026,01182,74,99457,56.71\n2026,01182,74,99458,44.64\n2026,01182,74,99470,28.53\n2026,01112,05,99445,73.14\n2026,01112,05,99453,29.95\n2026,01112,05,99454,73.14\n2026,01112,05,99457,65.26\n2026,01112,05,99458,50.66\n2026,01112,05,99470,32.81\n2026,01112,09,99445,74.79\n2026,01112,09,99453,30.61\n2026,01112,09,99454,74.79\n2026,01112,09,99457,66.49\n2026,01112,09,99458,51.56\n2026,01112,09,99470,33.43\n2026,01112,51,99445,68.40\n2026,01112,51,99453,28.07\n2026,01112,51,99454,68.40\n2026,01112,51,99457,61.96\n2026,01112,51,99458,48.31\n2026,01112,51,99470,31.16\n2026,01112,52,99445,73.15\n2026,01112,52,99453,29.98\n2026,01112,52,99454,73.15\n2026,01112,52,99457,65.31\n2026,01112,52,99458,50.71\n2026,01112,52,99470,32.84\n2026,01112,53,99445,68.39\n2026,01112,53,99453,28.04\n2026,01112,53,99454,68.39\n2026,01112,53,99457,61.89\n2026,01112,53,99458,48.24\n2026,01112,53,99470,31.12\n2026,01112,54,99445,56.94\n2026,01112,54,99453,23.47\n2026,01112,54,99454,56.94\n2026,01112,54,99457,54.52\n2026,01112,54,99458,43.17\n2026,01112,54,99470,27.43\n2026,01112,55,99445,56.92\n2026,01112,55,99453,23.42\n2026,01112,55,99454,56.92\n2026,01112,55,99457,54.38\n2026,01112,55,99458,43.04\n2026,01112,55,99470,27.36\n2026,01112,56,99445,56.92\n2026,01112,56,99453,23.42\n2026,01112,56,99454,56.92\n2026,01112,56,99457,54.38\n2026,01112,56,99458,43.04\n2026,01112,56,99470,27.36\n2026,01112,57,99445,56.92\n2026,01112,57,99453,23.42\n2026,01112,57,99454,56.92\n2026,01112,57,99457,54.38\n2026,01112,57,99458,43.04\n2026,01112,57,99470,27.36\n2026,01112,58,99445,56.92\n2026,01112,58,99453,23.42\n2026,01112,58,99454,56.92\n2026,01112,58,99457,54.38\n2026,01112,58,99458,43.04\n2026,01112,58,99470,27.36\n2026,01112,59,99445,56.92\n2026,01112,59,99453,23.42\n2026,01112,59,99454,56.92\n2026,01112,59,99457,54.38\n2026,01112,59,99458,43.04\n2026,01112,59,99470,27.36\n2026,01112,60,99445,56.92\n2026,01112,60,99453,23.42\n2026,01112,60,99454,56.92\n2026,01112,60,99457,54.38\n2026,01112,60,99458,43.04\n2026,01112,60,99470,27.36\n2026,01112,61,99445,56.92\n2026,01112,61,99453,23.42\n2026,01112,61,99454,56.92\n2026,01112,61,99457,54.38\n2026,01112,61,99458,43.04\n2026,01112,61,99470,27.36\n2026,01112,62,99445,57.03\n2026,01112,62,99453,23.63\n2026,01112,62,99454,57.03\n2026,01112,62,99457,54.83\n2026,01112,62,99458,43.48\n2026,01112,62,99470,27.58\n2026,01112,63,99445,60.39\n2026,01112,63,99453,24.83\n2026,01112,63,99454,60.39\n2026,01112,63,99457,56.78\n2026,01112,63,99458,44.74\n2026,01112,63,99470,28.57\n2026,01112,64,99445,60.18\n2026,01112,64,99453,24.75\n2026,01112,64,99454,60.18\n2026,01112,64,99457,56.56\n2026,01112,64,99458,44.56\n2026,01112,64,99470,28.45\n2026,01112,65,99445,74.83\n2026,01112,65,99453,30.70\n2026,01112,65,99454,74.83\n2026,01112,65,99457,66.68\n2026,01112,65,99458,51.75\n2026,01112,65,99470,33.53\n2026,01112,66,99445,63.08\n2026,01112,66,99453,25.92\n2026,01112,66,99454,63.08\n2026,01112,66,99457,58.04\n2026,01112,66,99458,45.46\n2026,01112,66,99470,29.19\n2026,01112,67,99445,63.75\n2026,01112,67,99453,26.20\n2026,01112,67,99454,63.75\n2026,01112,67,99457,58.62\n2026,01112,67,99458,45.90\n2026,01112,67,99470,29.48\n2026,01112,68,99445,56.92\n2026,01112,68,99453,23.42\n2026,01112,68,99454,56.92\n2026,01112,68,99457,54.38\n2026,01112,68,99458,43.04\n2026,01112,68,99470,27.36\n2026,01112,69,99445,56.92\n2026,01112,69,99453,23.42\n2026,01112,69,99454,56.92\n2026,01112,69,99457,54.38\n2026,01112,69,99458,43.04\n2026,01112,69,99470,27.36\n2026,01112,70,99445,56.92\n2026,01112,70,99453,23.42\n2026,01112,70,99454,56.92\n2026,01112,70,99457,54.38\n2026,01112,70,99458,43.04\n2026,01112,70,99470,27.36\n2026,01112,75,99445,56.92\n2026,01112,75,99453,23.42\n2026,01112,75,99454,56.92\n2026,01112,75,99457,54.38\n2026,01112,75,99458,43.04\n2026,01112,75,99470,27.36\n2026,04112,01,99445,55.35\n2026,04112,01,99453,22.91\n2026,04112,01,99454,55.35\n2026,04112,01,99457,53.65\n2026,04112,01,99458,42.63\n2026,04112,01,99470,26.99\n2026,13102,00,99445,56.16\n2026,13102,00,99453,23.47\n2026,13102,00,99454,56.16\n2026,13102,00,99457,54.77\n2026,13102,00,99458,43.62\n2026,13102,00,99470,27.56\n2026,12202,01,99445,61.36\n2026,12202,01,99453,25.53\n2026,12202,01,99454,61.36\n2026,12202,01,99457,58.37\n2026,12202,01,99458,46.18\n2026,12202,01,99470,29.36\n2026,12102,01,99445,51.45\n2026,12102,01,99453,21.39\n2026,12102,01,99454,51.45\n2026,12102,01,99457,51.38\n2026,12102,01,99458,41.15\n2026,12102,01,99470,25.86\n2026,09102,03,99445,53.05\n2026,09102,03,99453,22.52\n2026,09102,03,99454,53.05\n2026,09102,03,99457,53.24\n2026,09102,03,99458,42.75\n2026,09102,03,99470,26.79\n2026,09102,04,99445,54.74\n2026,09102,04,99453,23.59\n2026,09102,04,99454,54.74\n2026,09102,04,99457,55.05\n2026,09102,04,99458,44.27\n2026,09102,04,99470,27.69\n2026,09102,99,99445,50.00\n2026,09102,99,99453,21.12\n2026,09102,99,99454,50.00\n2026,09102,99,99457,51.12\n2026,09102,99,99458,41.22\n2026,09102,99,99470,25.73\n2026,10212,01,99445,53.00\n2026,10212,01,99453,22.18\n2026,10212,01,99454,53.00\n2026,10212,01,99457,52.58\n2026,10212,01,99458,42.06\n2026,10212,01,99470,26.46\n2026,10212,99,99445,46.58\n2026,10212,99,99453,19.57\n2026,10212,99,99454,46.58\n2026,10212,99,99457,48.78\n2026,10212,99,99458,39.55\n2026,10212,99,99470,24.56\n2026,01212,01,99445,59.06\n2026,01212,01,99453,24.31\n2026,01212,01,99454,59.06\n2026,01212,01,99457,55.33\n2026,01212,01,99458,43.55\n2026,01212,01,99470,27.83\n2026,05102,00,99445,47.50\n2026,05102,00,99453,19.52\n2026,05102,00,99454,47.50\n2026,05102,00,99457,48.41\n2026,05102,00,99458,38.94\n2026,05102,00,99470,24.37\n2026,02202,00,99445,47.79\n2026,02202,00,99453,19.68\n2026,02202,00,99454,47.79\n2026,02202,00,99457,48.66\n2026,02202,00,99458,39.14\n2026,02202,00,99470,24.50\n2026,06102,12,99445,48.30\n2026,06102,12,99453,20.70\n2026,06102,12,99454,48.30\n2026,06102,12,99457,50.72\n2026,06102,12,99458,41.20\n2026,06102,12,99470,25.53\n2026,06102,15,99445,53.76\n2026,06102,15,99453,22.79\n2026,06102,15,99454,53.76\n2026,06102,15,99457,53.76\n2026,06102,15,99458,43.12\n2026,06102,15,99470,27.05\n2026,06102,16,99445,52.80\n2026,06102,16,99453,22.68\n2026,06102,16,99454,52.80\n2026,06102,16,99457,53.79\n2026,06102,16,99458,43.39\n2026,06102,16,99470,27.07\n2026,06102,99,99445,47.79\n2026,06102,99,99453,20.26\n2026,06102,99,99454,47.79\n2026,06102,99,99457,49.91\n2026,06102,99,99458,40.45\n2026,06102,99,99470,25.12\n2026,08102,00,99445,48.15\n2026,08102,00,99453,19.83\n2026,08102,00,99454,48.15\n2026,08102,00,99457,48.89\n2026,08102,00,99458,39.29\n2026,08102,00,99470,24.61\n2026,05202,00,99445,46.97\n2026,05202,00,99453,19.36\n2026,05202,00,99454,46.97\n2026,05202,00,99457,48.22\n2026,05202,00,99458,38.86\n2026,05202,00,99470,24.28\n2026,15102,00,99445,46.33\n2026,15102,00,99453,19.32\n2026,15102,00,99454,46.33\n2026,15102,00,99457,48.32\n2026,15102,00,99458,39.12\n2026,15102,00,99470,24.33\n2026,07202,01,99445,49.10\n2026,07202,01,99453,20.56\n2026,07202,01,99454,49.10\n2026,07202,01,99457,50.18\n2026,07202,01,99458,40.44\n2026,07202,01,99470,25.26\n2026,07202,99,99445,46.14\n2026,07202,99,99453,19.26\n2026,07202,99,99454,46.14\n2026,07202,99,99457,48.26\n2026,07202,99,99458,39.09\n2026,07202,99,99470,24.30\n2026,14212,01,99445,62.11\n2026,14212,01,99453,25.72\n2026,14212,01,99454,62.11\n2026,14212,01,99457,58.29\n2026,14212,01,99458,45.93\n2026,14212,01,99470,29.32\n2026,14212,99,99445,54.78\n2026,14212,99,99453,22.69\n2026,14212,99,99454,54.78\n2026,14212,99,99457,53.42\n2026,14212,99,99458,42.52\n2026,14212,99,99470,26.88\n2026,12302,01,99445,55.96\n2026,12302,01,99453,23.41\n2026,12302,01,99454,55.96\n2026,12302,01,99457,54.61\n2026,12302,01,99458,43.50\n2026,12302,01,99470,27.47\n2026,12302,99,99445,52.70\n2026,12302,99,99453,21.91\n2026,12302,99,99454,52.70\n2026,12302,99,99457,52.23\n2026,12302,99,99458,41.75\n2026,12302,99,99470,26.28\n2026,14112,03,99445,51.52\n2026,14112,03,99453,21.27\n2026,14112,03,99454,51.52\n2026,14112,03,99457,51.01\n2026,14112,03,99458,40.75\n2026,14112,03,99470,25.67\n2026,14112,99,99445,47.84\n2026,14112,99,99453,19.77\n2026,14112,99,99454,47.84\n2026,14112,99,99457,48.86\n2026,14112,99,99458,39.34\n2026,14112,99,99470,24.60\n2026,08202,01,99445,50.52\n2026,08202,01,99453,21.43\n2026,08202,01,99454,50.52\n2026,08202,01,99457,51.64\n2026,08202,01,99458,41.64\n2026,08202,01,99470,25.98\n2026,08202,99,99445,47.64\n2026,08202,99,99453,19.97\n2026,08202,99,99454,47.64\n2026,08202,99,99457,49.33\n2026,08202,99,99458,39.87\n2026,08202,99,99470,24.83\n2026,06202,00,99445,53.37\n2026,06202,00,99453,21.85\n2026,06202,00,99454,53.37\n2026,06202,00,99457,51.70\n2026,06202,00,99458,41.05\n2026,06202,00,99470,26.02\n2026,05302,01,99445,49.62\n2026,05302,01,99453,20.70\n2026,05302,01,99454,49.62\n2026,05302,01,99457,50.33\n2026,05302,01,99458,40.47\n2026,05302,01,99470,25.33\n2026,05302,02,99445,48.94\n2026,05302,02,99453,20.41\n2026,05302,02,99454,48.94\n2026,05302,02,99457,49.91\n2026,05302,02,99458,40.18\n2026,05302,02,99470,25.12\n2026,05302,99,99445,44.95\n2026,05302,99,99453,18.79\n2026,05302,99,99454,44.95\n2026,05302,99,99457,47.59\n2026,05302,99,99458,38.66\n2026,05302,99,99470,23.96\n2026,07302,00,99445,44.82\n2026,07302,00,99453,18.61\n2026,07302,00,99454,44.82\n2026,07302,00,99457,47.24\n2026,07302,00,99458,38.33\n2026,07302,00,99470,23.79\n2026,03202,01,99445,52.10\n2026,03202,01,99453,21.71\n2026,03202,01,99454,52.10\n2026,03202,01,99457,51.77\n2026,03202,01,99458,41.41\n2026,03202,01,99470,26.05\n2026,11502,00,99445,48.52\n2026,11502,00,99453,20.06\n2026,11502,00,99454,48.52\n2026,11502,00,99457,49.28\n2026,11502,00,99458,39.61\n2026,11502,00,99470,24.80\n2026,03302,01,99445,51.91\n2026,03302,01,99453,21.31\n2026,03302,01,99454,51.91\n2026,03302,01,99457,50.98\n2026,03302,01,99458,40.62\n2026,03302,01,99470,25.66\n2026,05402,00,99445,47.91\n2026,05402,00,99453,19.67\n2026,05402,00,99454,47.91\n2026,05402,00,99457,48.63\n2026,05402,00,99458,39.07\n2026,05402,00,99470,24.48\n2026,14312,40,99445,54.19\n2026,14312,40,99453,22.49\n2026,14312,40,99454,54.19\n2026,14312,40,99457,52.84\n2026,14312,40,99458,42.06\n2026,14312,40,99470,26.59\n2026,12402,01,99445,60.41\n2026,12402,01,99453,25.12\n2026,12402,01,99454,60.41\n2026,12402,01,99457,57.96\n2026,12402,01,99458,45.94\n2026,12402,01,99470,29.16\n2026,12402,99,99445,56.90\n2026,12402,99,99453,23.71\n2026,12402,99,99454,56.90\n2026,12402,99,99457,55.48\n2026,12402,99,99458,44.17\n2026,12402,99,99470,27.91\n2026,04212,05,99445,47.88\n2026,04212,05,99453,20.10\n2026,04212,05,99454,47.88\n2026,04212,05,99457,49.54\n2026,04212,05,99458,40.05\n2026,04212,05,99470,24.94\n2026,01312,00,99445,52.10\n2026,01312,00,99453,21.62\n2026,01312,00,99454,52.10\n2026,01312,00,99457,51.58\n2026,01312,00,99458,41.21\n2026,01312,00,99470,25.96\n2026,13202,01,99445,60.69\n2026,13202,01,99453,25.51\n2026,13202,01,99454,60.69\n2026,13202,01,99457,58.73\n2026,13202,01,99458,46.70\n2026,13202,01,99470,29.54\n2026,13202,02,99445,62.18\n2026,13202,02,99453,26.26\n2026,13202,02,99454,62.18\n2026,13202,02,99457,59.90\n2026,13202,02,99458,47.59\n2026,13202,02,99470,30.13\n2026,13202,03,99445,57.09\n2026,13202,03,99453,23.85\n2026,13202,03,99454,57.09\n2026,13202,03,99457,55.82\n2026,13202,03,99458,44.49\n2026,13202,03,99470,28.09\n2026,13282,99,99445,49.42\n2026,13282,99,99453,20.46\n2026,13282,99,99454,49.42\n2026,13282,99,99457,49.87\n2026,13282,99,99458,40.03\n2026,13282,99,99470,25.10\n2026,13292,04,99445,61.68\n2026,13292,04,99453,25.84\n2026,13292,04,99454,61.68\n2026,13292,04,99457,59.14\n2026,13292,04,99458,46.90\n2026,13292,04,99470,29.75\n2026,15202,00,99445,47.60\n2026,15202,00,99453,19.89\n2026,15202,00,99454,47.60\n2026,15202,00,99457,49.17\n2026,15202,00,99458,39.71\n2026,15202,00,99470,24.75\n2026,04312,00,99445,46.49\n2026,04312,00,99453,19.31\n2026,04312,00,99454,46.49\n2026,04312,00,99457,48.26\n2026,04312,00,99458,39.01\n2026,04312,00,99470,24.30\n2026,02302,01,99445,57.77\n2026,02302,01,99453,23.88\n2026,02302,01,99454,57.77\n2026,02302,01,99457,55.09\n2026,02302,01,99458,43.59\n2026,02302,01,99470,27.72\n2026,02302,99,99445,51.80\n2026,02302,99,99453,21.43\n2026,02302,99,99454,51.80\n2026,02302,99,99457,51.25\n2026,02302,99,99458,40.94\n2026,02302,99,99470,25.79\n2026,12502,01,99445,54.29\n2026,12502,01,99453,22.70\n2026,12502,01,99454,54.29\n2026,12502,01,99457,53.63\n2026,12502,01,99458,42.85\n2026,12502,01,99470,26.98\n2026,12502,99,99445,47.84\n2026,12502,99,99453,19.95\n2026,12502,99,99454,47.84\n2026,12502,99,99457,49.23\n2026,12502,99,99458,39.73\n2026,12502,99,99470,24.78\n2026,09202,20,99445,52.67\n2026,09202,20,99453,21.93\n2026,09202,20,99454,52.67\n2026,09202,20,99457,52.08\n2026,09202,20,99458,41.61\n2026,09202,20,99470,26.21\n2026,09202,50,99445,52.67\n2026,09202,50,99453,21.93\n2026,09202,50,99454,52.67\n2026,09202,50,99457,52.08\n2026,09202,50,99458,41.61\n2026,09202,50,99470,26.21\n2026,14412,01,99445,53.78\n2026,14412,01,99453,22.33\n2026,14412,01,99454,53.78\n2026,14412,01,99457,53.01\n2026,14412,01,99458,42.31\n2026,14412,01,99470,26.67\n2026,11202,01,99445,48.12\n2026,11202,01,99453,20.01\n2026,11202,01,99454,48.12\n2026,11202,01,99457,49.29\n2026,11202,01,99458,39.72\n2026,11202,01,99470,24.81\n2026,03402,02,99445,51.88\n2026,03402,02,99453,21.27\n2026,03402,02,99454,51.88\n2026,03402,02,99457,50.88\n2026,03402,02,99458,40.53\n2026,03402,02,99470,25.61\n2026,10312,35,99445,47.24\n2026,10312,35,99453,19.49\n2026,10312,35,99454,47.24\n2026,10312,35,99457,48.42\n2026,10312,35,99458,39.01\n2026,10312,35,99470,24.38\n2026,04412,09,99445,51.57\n2026,04412,09,99453,21.37\n2026,04412,09,99454,51.57\n2026,04412,09,99457,51.37\n2026,04412,09,99458,41.11\n2026,04412,09,99470,25.85\n2026,04412,11,99445,51.85\n2026,04412,11,99453,21.53\n2026,04412,11,99454,51.85\n2026,04412,11,99457,51.64\n2026,04412,11,99458,41.33\n2026,04412,11,99470,25.99\n2026,04412,15,99445,51.69\n2026,04412,15,99453,21.45\n2026,04412,15,99454,51.69\n2026,04412,15,99457,51.49\n2026,04412,15,99458,41.21\n2026,04412,15,99470,25.92\n2026,04412,18,99445,51.87\n2026,04412,18,99453,21.81\n2026,04412,18,99454,51.87\n2026,04412,18,99457,52.23\n2026,04412,18,99458,41.94\n2026,04412,18,99470,26.28\n2026,04412,20,99445,47.42\n2026,04412,20,99453,19.77\n2026,04412,20,99454,47.42\n2026,04412,20,99457,48.97\n2026,04412,20,99458,39.55\n2026,04412,20,99470,24.65\n2026,04412,28,99445,51.34\n2026,04412,28,99453,21.33\n2026,04412,28,99454,51.34\n2026,04412,28,99457,51.36\n2026,04412,28,99458,41.15\n2026,04412,28,99470,25.85\n2026,04412,31,99445,55.07\n2026,04412,31,99453,22.85\n2026,04412,31,99454,55.07\n2026,04412,31,99457,53.40\n2026,04412,31,99458,42.45\n2026,04412,31,99470,26.87\n2026,04412,99,99445,49.43\n2026,04412,99,99453,20.57\n2026,04412,99,99454,49.43\n2026,04412,99,99457,50.11\n2026,04412,99,99458,40.28\n2026,04412,99,99470,25.22\n2026,03502,09,99445,48.97\n2026,03502,09,99453,20.38\n2026,03502,09,99454,48.97\n2026,03502,09,99457,49.83\n2026,03502,09,99458,40.10\n2026,03502,09,99470,25.08\n2026,11302,00,99445,51.13\n2026,11302,00,99453,21.16\n2026,11302,00,99454,51.13\n2026,11302,00,99457,50.87\n2026,11302,00,99458,40.69\n2026,11302,00,99470,25.60\n2026,14512,50,99445,51.42\n2026,14512,50,99453,21.17\n2026,14512,50,99454,51.42\n2026,14512,50,99457,50.81\n2026,14512,50,99458,40.56\n2026,14512,50,99470,25.57\n2026,02402,02,99445,63.80\n2026,02402,02,99453,26.37\n2026,02402,02,99454,63.80\n2026,02402,02,99457,59.37\n2026,02402,02,99458,46.66\n2026,02402,02,99470,29.86\n2026,02402,99,99445,54.77\n2026,02402,99,99453,22.67\n2026,02402,99,99454,54.77\n2026,02402,99,99457,53.31\n2026,02402,99,99458,42.41\n2026,02402,99,99470,26.82\n2026,06302,00,99445,49.70\n2026,06302,00,99453,20.36\n2026,06302,00,99454,49.70\n2026,06302,00,99457,49.58\n2026,06302,00,99458,39.66\n2026,06302,00,99470,24.96\n2026,11402,16,99445,45.47\n2026,11402,16,99453,19.24\n2026,11402,16,99454,45.47\n2026,11402,16,99457,48.41\n2026,11402,16,99458,39.41\n2026,11402,16,99470,24.37\n2026,03602,21,99445,52.02\n2026,03602,21,99453,21.54\n2026,03602,21,99454,52.02\n2026,03602,21,99457,51.42\n2026,03602,21,99458,41.07\n2026,03602,21,99470,25.88";
+
+var locs={};
+RAW.split("\n").forEach(function(line){
+  var p=line.split(",");
+  if(p.length<5)return;
+  var carrier=p[1].trim(),loc=p[2].trim(),code=p[3].trim(),rate=parseFloat(p[4]);
+  var key=carrier+loc;
+  if(!locs[key])locs[key]={carrier:carrier,loc:loc,rates:{}};
+  locs[key].rates[code]=rate;
+});
+var localities={};
+Object.keys(locs).forEach(function(key){
+  var d=locs[key],fc=d.carrier+d.loc;
+  if(CODES.every(function(c){return d.rates[c]!==undefined})){
+    var name=fc+" - "+(LOCNAMES[fc]||"Locality "+fc);
+    localities[name]=d.rates;
+  }
+});
+var sorted=Object.keys(localities).sort(function(a,b){
+  var na=a.split(" - ")[1]||a;
+  var nb=b.split(" - ")[1]||b;
+  return na.localeCompare(nb);
+});
+
+function sumRates(name){var s=0;CODES.forEach(function(c){s+=(localities[name][c]||0)});return s}
+var ranked=sorted.slice().sort(function(a,b){return sumRates(a)-sumRates(b)});
+var tierMap={};
+var third=Math.floor(ranked.length/3);
+for(var i=0;i<ranked.length;i++){
+  if(i<third)tierMap[ranked[i]]="24.00";
+  else if(i<third*2)tierMap[ranked[i]]="28.80";
+  else tierMap[ranked[i]]="33.60";
+}
+
+var sel=sorted[0]||"";
+
+function num(v){var x=parseFloat(v);return isNaN(x)?0:x}
+function fmt(v){return v.toLocaleString("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2})}
+function fmtK(v){return v.toLocaleString("en-US",{style:"currency",currency:"USD",minimumFractionDigits:0})}
+function pct(v){return(v*100).toFixed(0)+"%"}
+
+function buildSel(filter){
+  var s=document.getElementById("sel");
+  var f=(filter||"").toLowerCase();
+  var filtered=sorted.filter(function(k){return !f||k.toLowerCase().indexOf(f)!==-1});
+  s.innerHTML=filtered.map(function(k){return '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+k+'</option>'}).join("");
+}
+
+function filterSel(){buildSel(document.getElementById("srch").value)}
+
+function pickLocality(name){
+  if(!name||!localities[name])return;
+  sel=name;
+  document.getElementById("shr").value=tierMap[sel]||"28.80";
+  buildRates();buildPA();calc();
+}
+
+function selectFromLib(name){
+  sel=name;
+  document.getElementById("sel").value=name;
+  document.getElementById("shr").value=tierMap[sel]||"28.80";
+  buildRates();buildPA();calc();sw("inputs");
+}
+
+function buildRates(){
+  var r=localities[sel]||{};
+  document.getElementById("rrows").innerHTML=CODES.map(function(c){
+    return '<div class="rr"><span class="cd">'+c+'</span><span class="ds">'+DESC[c]+'</span><div class="riw"><span class="pf">$</span><input class="n" id="r-'+c+'" value="'+(r[c]||0).toFixed(2)+'" oninput="calc()"></div><span class="fr">'+FREQ[c]+'</span></div>';
+  }).join("");
+  document.getElementById("rtitle").textContent="Reimbursement Rates \u2014 "+sel;
+}
+
+function buildPA(){
+  document.getElementById("parows").innerHTML=PAC.map(function(c){
+    return '<div class="par"><span class="cd">'+c+'</span><span class="ds">'+DESC[c]+'</span><div class="pac"><input class="ns" id="pa13-'+c+'" value="'+DPA[c].a+'" oninput="calc()"><span style="color:#9ca3af;font-size:13px">%</span></div><div class="pac"><input class="ns" id="pa46-'+c+'" value="'+DPA[c].b+'" oninput="calc()"><span style="color:#9ca3af;font-size:13px">%</span></div></div>';
+  }).join("");
+}
+
+function buildLib(){
+  var f=(document.getElementById("libSrch")?document.getElementById("libSrch").value:"").toLowerCase();
+  var filtered=sorted.filter(function(k){return !f||k.toLowerCase().indexOf(f)!==-1});
+  document.getElementById("libTitle").textContent="Locality Rate Library ("+sorted.length+" localities)";
+  var h='<thead><tr><th>Locality</th>'+CODES.map(function(c){return '<th class="r">'+c+'</th>'}).join("")+'</tr></thead><tbody>';
+  filtered.forEach(function(name){
+    var cls=name===sel?"ac":"";
+    h+='<tr class="'+cls+'" onclick="selectFromLib(\''+name.replace(/'/g,"\\'")+'\')">';
+    h+='<td>'+name+(name===sel?'<span class="bdg">active</span>':'')+'</td>';
+    CODES.forEach(function(c){h+='<td class="r">$'+(localities[name][c]||0).toFixed(2)+'</td>'});
+    h+='</tr>';
+  });
+  h+='</tbody>';
+  document.getElementById("libT").innerHTML=h;
+  document.getElementById("ftr").textContent="RPM Financial Model CY2026 \u2022 "+sorted.length+" localities";
+  document.getElementById("libtab").textContent="Localities ("+sorted.length+")";
+}
+
+var currentTab="inputs";
+function sw(t){
+  currentTab=t;
+  var tabs=document.getElementById("maintabs").getElementsByTagName("button");
+  var tabNames=["inputs","practice","results","library"];
+  for(var i=0;i<tabs.length;i++){tabs[i].className=tabNames[i]===t?"tab active":"tab"}
+  for(var j=0;j<tabNames.length;j++){document.getElementById("tab-"+tabNames[j]).className=tabNames[j]===t?"":"hid"}
+  if(t==="library")buildLib();
+  if(t==="results")calc();
+}
+
+function calc(){
+  var rates={};CODES.forEach(function(c){var el=document.getElementById("r-"+c);rates[c]=el?num(el.value):0});
+  var pa={};PAC.forEach(function(c){
+    var a=document.getElementById("pa13-"+c),b=document.getElementById("pa46-"+c);
+    pa[c]={a:a?num(a.value)/100:0,b:b?num(b.value)/100:0};
+  });
+  var pts=num(document.getElementById("pts").value);
+  var mo=num(document.getElementById("amo").value)||6;
+  var co=num(document.getElementById("col").value)/100;
+  var bi=num(document.getElementById("bil").value)/100;
+  var sm=num(document.getElementById("smd").value);
+  var sh=num(document.getElementById("shr").value);
+  var s13=num(document.getElementById("st13").value)/60;
+  var s46=num(document.getElementById("st46").value)/60;
+  var c13=Math.round(sh*s13*3*100)/100;
+  var c46=Math.round(sh*s46*3*100)/100;
+  var al=rates["99453"],r13=0,r46=0;
+  PAC.forEach(function(c){r13+=rates[c]*pa[c].a;r46+=rates[c]*pa[c].b});
+  al+=r13*3+r46*3;
+  var rv6=Math.round(al*bi*co*100)/100;
+  var sw6=Math.round(sm*6*bi*100)/100;
+  var lb6=Math.round((c13+c46)*100)/100;
+  var pr=Math.round((rv6-((sw6*bi)+lb6))*100)/100;
+  var rv12=Math.round(rv6*pts*(12/mo));
+  var swA=Math.round(sm*pts*12*bi);
+  var stA=Math.round((lb6/6)*pts*12);
+  var tot=rv12-swA-stA;
+  document.getElementById("sc13").textContent=fmt(c13/3);
+  document.getElementById("sc46").textContent=fmt(c46/3);
+  document.getElementById("r13").textContent=fmt(r13);
+  document.getElementById("r46").textContent=fmt(r46);
+  document.getElementById("rloc").textContent=sel;
+  document.getElementById("rA").textContent=fmt(al);
+  document.getElementById("rCL").textContent="Collection ("+Math.round(co*100)+"%) \u00d7 Billable ("+Math.round(bi*100)+"%)";
+  document.getElementById("rR6").textContent=fmt(rv6);
+  document.getElementById("rS6").textContent=fmt(sw6);
+  document.getElementById("rL6").textContent=fmt(lb6);
+  document.getElementById("rP").textContent=fmt(pr);
+  document.getElementById("rTT").textContent="Total Program (12 Months, "+pts+" patients)";
+  document.getElementById("rR12").textContent=fmtK(rv12);
+  document.getElementById("rSA").textContent=fmtK(swA);
+  document.getElementById("rStA").textContent=fmtK(stA);
+  document.getElementById("rT").textContent=fmtK(tot);
+  document.getElementById("mP").textContent=fmt(pr);
+  document.getElementById("mM").textContent=pct(pr/(rv6||1));
+  document.getElementById("mT").textContent=fmtK(tot);
+}
+
+buildSel();
+buildRates();
+buildPA();
+document.getElementById("shr").value=tierMap[sel]||"28.80";
+calc();
+buildLib();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPM Financial Model - CY2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f3f4f6;color:#1f2937;min-height:100vh}
+.ctr{max-width:920px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow:hidden}
+.hdr{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hdr h1{color:#fff;font-size:20px;margin-bottom:4px}
+.hdr .sub{color:#93c5fd;font-size:12px;margin-bottom:12px}
+.hdr-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.hdr-row label{color:#93c5fd;font-size:14px;white-space:nowrap}
+.hdr select{background:#1e3a8a;color:#fff;border:1px solid #3b82f6;border-radius:6px;padding:8px 10px;font-size:14px;flex:1;min-width:200px;-webkit-appearance:none;appearance:none}
+.hdr select option{background:#1e3a8a}
+.tabs{display:flex;border-bottom:1px solid #e5e7eb;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:#6b7280;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.tab:hover{color:#374151}.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8;background:#eff6ff}
+.cnt{padding:20px}
+.sec{margin-bottom:24px}
+.st{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;margin-bottom:14px}
+.rt{background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden}
+.rh{display:grid;grid-template-columns:80px 1fr 120px 80px;background:#e5e7eb;padding:8px 12px}
+.rh span{font-size:11px;font-weight:700;color:#4b5563;text-transform:uppercase}
+.rr{display:grid;grid-template-columns:80px 1fr 120px 80px;padding:8px 12px;border-top:1px solid #e5e7eb;align-items:center}
+.cd{font-family:monospace;font-weight:700;color:#1d4ed8;font-size:14px}
+.ds{font-size:12px;color:#6b7280}.fr{font-size:12px;color:#6b7280;text-align:right}
+.riw{position:relative;width:110px}.riw .pf{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:14px}
+input.n{border:1px solid #d1d5db;border-radius:6px;padding:5px 8px 5px 20px;text-align:right;width:110px;font-size:14px;outline:none}
+input.n:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+input.np{border:1px solid #d1d5db;border-radius:6px;padding:5px 8px;text-align:right;width:110px;font-size:14px;outline:none}
+input.np:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+input.ns{border:1px solid #d1d5db;border-radius:6px;padding:5px 6px;text-align:center;width:60px;font-size:14px;outline:none}
+input.ns:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{display:flex;align-items:center;justify-content:space-between}
+.fld label{font-size:14px;color:#374151}
+.ib{background:#eff6ff;border-radius:8px;padding:12px;margin-top:12px}
+.row{display:flex;justify-content:space-between;padding:6px 12px}
+.row.hl{background:#fefce8;border-radius:6px}
+.row .l{font-size:14px;color:#374151}.row .v{font-size:14px;color:#111827}
+.row .v.b{font-weight:700;color:#15803d}
+.dv{border-top:1px solid #e5e7eb;margin:8px 0}
+.pb{display:flex;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;align-items:center}
+.pb .l{font-size:14px;font-weight:700;color:#166534}.pb .v{font-size:20px;font-weight:700;color:#15803d}
+.mts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
+.mt{border-radius:8px;padding:14px;text-align:center}
+.mt .ml{font-size:11px;text-transform:uppercase;font-weight:600;opacity:.7}
+.mt .mv{font-size:20px;font-weight:700;margin-top:4px}
+.mb{background:#eff6ff}.mg{background:#f0fdf4}.my{background:#fefce8}
+.lb{display:inline-block;background:#eff6ff;color:#1d4ed8;padding:6px 14px;border-radius:8px;font-size:14px;font-weight:600;margin-bottom:16px}
+table.lt{width:100%;font-size:12px;border-collapse:collapse}
+table.lt th{text-align:left;padding:6px 8px;font-size:11px;font-weight:700;color:#4b5563;text-transform:uppercase;background:#f3f4f6;position:sticky;top:0}
+table.lt th.r{text-align:right}
+table.lt td{padding:6px 8px;border-top:1px solid #f3f4f6}
+table.lt td.r{text-align:right;font-family:monospace;color:#4b5563}
+table.lt tr{cursor:pointer;transition:background .15s}
+table.lt tr:hover{background:#f9fafb}
+table.lt tr.ac{background:#eff6ff}
+table.lt tr.ac td:first-child{font-weight:700;color:#1d4ed8}
+.bdg{display:inline-block;background:#bfdbfe;color:#1e40af;font-size:10px;padding:2px 6px;border-radius:4px;margin-left:6px}
+.pat{background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden}
+.pah{display:grid;grid-template-columns:80px 1fr 100px 100px;background:#e5e7eb;padding:8px 12px}
+.pah span{font-size:11px;font-weight:700;color:#4b5563;text-transform:uppercase;text-align:center}
+.pah span:first-child,.pah span:nth-child(2){text-align:left}
+.par{display:grid;grid-template-columns:80px 1fr 100px 100px;padding:8px 12px;border-top:1px solid #e5e7eb;align-items:center}
+.pac{display:flex;justify-content:center;align-items:center;gap:4px}
+.ftr{text-align:center;padding:12px;font-size:12px;color:#9ca3af}
+.hid{display:none}
+.srch{background:#f9fafb;color:#1f2937;border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:13px;width:100%;margin-bottom:12px}
+.srch::placeholder{color:#9ca3af}
+.libw{max-height:500px;overflow-y:auto}
+@media(max-width:640px){
+.ctr{padding:4px}
+.hdr{padding:14px;flex-direction:column;align-items:flex-start;gap:8px}
+.hdr h1{font-size:17px}
+.hdr-row{flex-direction:column;align-items:stretch;width:100%}
+.hdr-row label{font-size:13px}
+.hdr-srch{width:100% !important;font-size:16px;padding:10px}
+.hdr select{width:100%;min-width:0;font-size:16px;padding:12px 10px;min-height:44px}
+.tab{padding:10px 12px;font-size:12px;min-height:44px;display:flex;align-items:center}
+.cnt{padding:12px}
+.g2{grid-template-columns:1fr}
+.fld{flex-wrap:wrap;gap:6px}
+.fld label{font-size:13px;flex:1;min-width:0}
+input.n,input.np{width:100px;font-size:14px;padding:8px 8px 8px 20px;min-height:40px}
+input.np{padding:8px}
+input.ns{width:60px;font-size:14px;min-height:40px}
+.riw{width:100px}
+.rh,.rr{grid-template-columns:55px 1fr 90px 55px;padding:6px 6px}
+.rh span{font-size:9px}
+.cd{font-size:11px}
+.ds{font-size:10px}
+.fr{font-size:10px}
+.pah,.par{grid-template-columns:55px 1fr 75px 75px;padding:6px 6px}
+.pah span{font-size:9px}
+.row .l,.row .v{font-size:13px}
+.pb .l{font-size:13px}.pb .v{font-size:17px}
+.mts{grid-template-columns:1fr}
+.mt .mv{font-size:18px}
+.lb{font-size:12px;padding:5px 10px;word-break:break-all}
+.st{font-size:10px}
+.libw{max-height:400px}
+table.lt{font-size:11px}
+table.lt th,table.lt td{padding:5px 4px}
+table.lt tr{min-height:44px}
+.ib{padding:8px}
+.srch{font-size:14px;padding:8px 10px}
+}
+</style>
+</head>
+<body>
+<div class="ctr">
+<div class="card">
+<div class="hdr">
+<div>
+<h1>RPM Financial Model</h1>
+<div class="sub">CY2026 CMS Physician Fee Schedule — Non-Facility Rates</div>
+</div>
 </div>
 <div style="background:linear-gradient(135deg,#1d4ed8,#1e3a8a);padding:0 20px 20px">
 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
